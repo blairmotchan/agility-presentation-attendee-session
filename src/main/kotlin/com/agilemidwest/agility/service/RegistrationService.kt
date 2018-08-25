@@ -19,13 +19,15 @@ class RegistrationService(
 ) {
     private var objectMapper = com.fasterxml.jackson.databind.ObjectMapper()
 
-    fun registerByHttp(request: RegistrationRequest) {
+    fun registerByHttp(request: RegistrationRequest):RegistrationResponse {
         val jsonResponse: HttpResponse<JsonNode> = Unirest.post("http://localhost:8083/registration")
                 .header("Content-Type", "application/json")
                 .body(objectMapper.writeValueAsString(request))
                 .asJson()
         val response = objectMapper.readValue(jsonResponse.body.toString(), RegistrationResponse::class.java)
         completeRegistration(response)
+
+        return response
     }
 
     fun completeRegistration(response: RegistrationResponse) {

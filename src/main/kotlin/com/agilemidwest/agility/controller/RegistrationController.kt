@@ -1,13 +1,17 @@
 package com.agilemidwest.agility.controller
 
 import com.agilemidwest.agility.contract.RegistrationRequest
+import com.agilemidwest.agility.contract.RegistrationResponse
 import com.agilemidwest.agility.domain.AttendeeSession
+import com.agilemidwest.agility.domain.QueueResponse
 import com.agilemidwest.agility.repository.AttendeeSessionRepository
 import com.agilemidwest.agility.service.QueueService
 import com.agilemidwest.agility.service.RegistrationService
-import org.springframework.http.HttpStatus.OK
-import org.springframework.web.bind.annotation.*
+import org.springframework.web.bind.annotation.PathVariable
+import org.springframework.web.bind.annotation.RequestBody
+import org.springframework.web.bind.annotation.RequestMapping
 import org.springframework.web.bind.annotation.RequestMethod.POST
+import org.springframework.web.bind.annotation.RestController
 
 @RestController
 @RequestMapping("/registration")
@@ -17,15 +21,14 @@ class RegistrationController(
         private val queueService: QueueService
 ) {
     @RequestMapping(method = [POST], value = ["http"])
-    @ResponseStatus(OK)
-    fun registerByHttp(@RequestBody registrationRequest: RegistrationRequest) {
-        registrationService.registerByHttp(registrationRequest)
+    fun registerByHttp(@RequestBody registrationRequest: RegistrationRequest): RegistrationResponse {
+        return registrationService.registerByHttp(registrationRequest)
     }
 
     @RequestMapping(method = [POST], value = ["queue"])
-    @ResponseStatus(OK)
-    fun registerByQueue(@RequestBody registrationRequest: RegistrationRequest) {
+    fun registerByQueue(@RequestBody registrationRequest: RegistrationRequest): QueueResponse {
         queueService.sendMessage(registrationRequest)
+        return QueueResponse(true, registrationRequest.sessionId, registrationRequest.attendeeId)
     }
 
     @RequestMapping("/attendee/{attendeeId}/sessions")
